@@ -134,11 +134,16 @@ setTimeout(() => {
     cancelAnimationFrame(animationID);
     cancelAnimationFrame(slowDownID);
     particles.forEach(p => {
-        const tangent = heartShapeDerivative(p.t, p.scale);
-        p.speedX = -tangent.y / 50;
-        p.speedY = -tangent.x / 50;
+        // explode tangent to the shape of the heart
+        // const tangent = heartShapeDerivative(p.t, p.scale);
+        // p.speedX = -tangent.y / 50;
+        // p.speedY = -tangent.x / 50;
+        // explode outwards from center
         // p.speedX = (p.x - canvas.width / 2) / 50;
         // p.speedY = (p.y - canvas.height / 2) / 50;
+        // explode in a diagonal direction randomly
+        p.speedX = (Math.random() - 0.5) * 10;
+        p.speedY = (Math.random() - 0.5) * 10;
     });
     explode();
     document.getElementById('sentence').style.bottom = '50%';
