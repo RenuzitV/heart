@@ -13,15 +13,23 @@ function heartShape(t, scale) {
     };
 }
 
-for (let i = 0, hearts = 0; hearts < 50; i += Math.PI*Math.random(), hearts++) {
-    const scale = 15;
+//based on x and y, scale the heart to be at most the width of the canvas minus some padding, or half the height of the canvas minus some padding
+const scale = Math.min((canvas.width - 100) / 32, (canvas.height - 100) / 26);
+
+// also based on scale, set the maximum number of hearts
+const maxHearts = Math.floor(scale * 4);
+
+// also based on scale, set the size of the hearts
+const heartSize = scale / 3;
+
+for (let i = 0, hearts = 0; hearts < maxHearts; i += Math.PI*Math.random(), hearts++) {
     const position = heartShape(i, scale);
     particles.push({
         t: i,
         scale: scale,
         x: position.x + canvas.width / 2,
         y: -position.y + canvas.height / 2,
-        size: Math.random() * 5 + 5,
+        size: Math.random() * heartSize + 5,
         speedX: 0,
         speedY: 0,
         // random speedT between 0.01 and 0.002 and can be negative
