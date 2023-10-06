@@ -14,4 +14,5 @@ body {
     transition: all 2s;
     opacity: 0;
     text-align: center;
+    font-family: 'Operetta 8 Regular';
 }

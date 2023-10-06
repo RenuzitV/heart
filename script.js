@@ -17,7 +17,7 @@ function heartShape(t, scale) {
 const scale = Math.min((canvas.width - 100) / 32, (canvas.height - 100) / 26);
 
 // also based on scale, set the maximum number of hearts
-const maxHearts = Math.floor(scale * 4);
+const maxHearts = Math.floor(scale * 5);
 
 // also based on scale, set the size of the hearts
 const heartSize = scale / 3;
@@ -67,7 +67,6 @@ function animate() {
     // console.log(particles[0].x, particles[0].y);
 }
 
-animate();
 
 let slowDownID;
 
@@ -89,17 +88,57 @@ function explode(){
     requestAnimationFrame(explode);
 }
 
+function monthDifference(date1, date2) {
+    let months;
+    months = (date2.getFullYear() - date1.getFullYear()) * 12;
+    months -= date1.getMonth();
+    months += date2.getMonth();
+    return months <= 0 ? 0 : months;
+}
+
+function updateMonthCount() {
+    const startDate = new Date("12/07/2022");
+    const currentDate = new Date();
+    let monthCount = 0;
+
+    if (currentDate.getDate() >= startDate.getDate()) {
+        monthCount = monthDifference(startDate, currentDate);
+    } else {
+        // if currentDate.getDate() is less than startDate.getDate(), calculate the months till previous month
+        const prevMonthDate = new Date(currentDate);
+        prevMonthDate.setMonth(prevMonthDate.getMonth() - 1);
+        monthCount = monthDifference(startDate, prevMonthDate);
+    }
+
+    document.getElementById('month').innerHTML = `${monthCount}`;
+}
+
+updateMonthCount();
+
+animate();
+
 setTimeout(() => {
     slowDown();
 }, 5000);
+
+
+function heartShapeDerivative(t, scale) {
+    return {
+        x: scale * (48 * Math.pow(Math.sin(t), 2) * Math.cos(t)),
+        y: scale * (-13 * Math.sin(t) + 10 * Math.sin(2 * t) + 6 * Math.sin(3 * t) + 4 * Math.sin(4 * t))
+    };
+}
 
 setTimeout(() => {
     // fire outwards from center  
     cancelAnimationFrame(animationID);
     cancelAnimationFrame(slowDownID);
     particles.forEach(p => {
-        p.speedX = (p.x - canvas.width / 2) / 50;
-        p.speedY = (p.y - canvas.height / 2) / 50;
+        const tangent = heartShapeDerivative(p.t, p.scale);
+        p.speedX = -tangent.y / 50;
+        p.speedY = -tangent.x / 50;
+        // p.speedX = (p.x - canvas.width / 2) / 50;
+        // p.speedY = (p.y - canvas.height / 2) / 50;
     });
     explode();
     document.getElementById('sentence').style.bottom = '50%';
