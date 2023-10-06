@@ -14,7 +14,7 @@ function heartShape(t, scale) {
 }
 
 //based on x and y, scale the heart to be at most the width of the canvas minus some padding, or half the height of the canvas minus some padding
-const scale = Math.min((canvas.width - 100) / 32, (canvas.height - 100) / 26);
+const scale = Math.min((canvas.width - 100) / 32, (canvas.height * 0.65) / 26);
 
 // also based on scale, set the maximum number of hearts
 const maxHearts = Math.floor(scale * 5);
