@@ -24,16 +24,19 @@ const heartSize = scale / 3;
 
 for (let i = 0, hearts = 0; hearts < maxHearts; i += Math.PI*Math.random(), hearts++) {
     const position = heartShape(i, scale);
+    // random maxT between 0.01 and 0.005 and can be negative
+    const maxT = (Math.random() * 0.008 + 0.0001) * (Math.random() > 0.5 ? 1 : -1)
     particles.push({
+        //inital position
         t: i,
+        speedT: 0,
+        maxT: maxT,
         scale: scale,
         x: position.x + canvas.width / 2,
         y: -position.y + canvas.height / 2,
         size: Math.random() * heartSize + 5,
         speedX: 0,
         speedY: 0,
-        // random speedT between 0.01 and 0.002 and can be negative
-        speedT: (Math.random() * 0.008 + 0.002) * (Math.random() > 0.5 ? 1 : -1),
         color: colors[Math.floor(Math.random() * colors.length)]
     });
 }
@@ -54,19 +57,42 @@ function updateParticles() {
         p.x = position.x + canvas.width / 2;
         p.y = -position.y + canvas.height / 2;
     });
-    console.log(particles[0].x, particles[0].y);
+    console.log(particles[0].x, particles[0].y, particles[0].speedT);
 }
 
 let animationID;
 
 function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#ffcfcf";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawParticles();
-    updateParticles();
     animationID = requestAnimationFrame(animate);
     // console.log(particles[0].x, particles[0].y);
 }
 
+let heartAnimateID;
+
+function heartAnimate() {
+    updateParticles();
+    heartAnimateID = requestAnimationFrame(heartAnimate);
+}
+
+
+let speedupID;
+
+function speedUp(){
+    particles.forEach(p => {
+        // p.speedT = Math.min(p.maxT, p.speedT + p.maxT/1000);
+        // p.speedT = Math.min(p.maxT, p.speedT*1.0001);
+        if (p.maxT > 0){
+            p.speedT = Math.min(p.maxT, p.speedT*1.06);
+        } else {
+            p.speedT = Math.max(p.maxT, p.speedT*1.06);
+        }
+    });
+    speedupID = requestAnimationFrame(speedUp);
+}
 
 let slowDownID;
 
@@ -82,8 +108,6 @@ function explode(){
         p.x += p.speedX;
         p.y += p.speedY;
     });
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    drawParticles();
     console.log(particles[0].x, particles[0].y);
     requestAnimationFrame(explode);
 }
@@ -116,10 +140,22 @@ function updateMonthCount() {
 updateMonthCount();
 
 animate();
+heartAnimate();
+
+setTimeout(() => {
+    particles.forEach(p => {    
+        p.speedT = p.maxT/50;
+    });
+    speedUp();
+}, 500);
+
+setTimeout(() => { 
+    cancelAnimationFrame(speedupID);
+}, 6000);
 
 setTimeout(() => {
     slowDown();
-}, 5000);
+}, 8000);
 
 
 function heartShapeDerivative(t, scale) {
@@ -131,17 +167,20 @@ function heartShapeDerivative(t, scale) {
 
 setTimeout(() => {
     // fire outwards from center  
-    cancelAnimationFrame(animationID);
+    // cancelAnimationFrame(animationID);
+    cancelAnimationFrame(heartAnimateID);
     cancelAnimationFrame(slowDownID);
     particles.forEach(p => {
         // explode tangent to the shape of the heart
         // const tangent = heartShapeDerivative(p.t, p.scale);
         // p.speedX = -tangent.y / 50;
         // p.speedY = -tangent.x / 50;
+
         // explode outwards from center
         // p.speedX = (p.x - canvas.width / 2) / 50;
         // p.speedY = (p.y - canvas.height / 2) / 50;
-        // explode in a diagonal direction randomly
+
+        // explode in a randomly fashion
         p.speedX = (Math.random() - 0.5) * 10;
         p.speedY = (Math.random() - 0.5) * 10;
     });
@@ -149,4 +188,4 @@ setTimeout(() => {
     document.getElementById('sentence').style.bottom = '50%';
     document.getElementById('sentence').style.opacity = '1';
     document.getElementById('sentence').style.fontSize = '24px';
-}, 7000);
+}, 12000);
