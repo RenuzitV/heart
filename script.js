@@ -25,7 +25,7 @@ const heartSize = scale / 3;
 for (let i = 0, hearts = 0; hearts < maxHearts; i += Math.PI*Math.random(), hearts++) {
     const position = heartShape(i, scale);
     // random maxT between 0.01 and 0.005 and can be negative
-    const maxT = (Math.random() * 0.008 + 0.0001) * (Math.random() > 0.5 ? 1 : -1)
+    const maxT = (Math.random() * 0.008 + 0.00005) * (Math.random() > 0.5 ? 1 : -1)
     particles.push({
         //inital position
         t: i,
@@ -86,9 +86,9 @@ function speedUp(){
         // p.speedT = Math.min(p.maxT, p.speedT + p.maxT/1000);
         // p.speedT = Math.min(p.maxT, p.speedT*1.0001);
         if (p.maxT > 0){
-            p.speedT = Math.min(p.maxT, p.speedT*1.06);
+            p.speedT = Math.min(p.maxT, p.speedT + (p.maxT - p.speedT) / 150);
         } else {
-            p.speedT = Math.max(p.maxT, p.speedT*1.06);
+            p.speedT = Math.max(p.maxT, p.speedT + (p.maxT - p.speedT) / 150);
         }
     });
     speedupID = requestAnimationFrame(speedUp);
@@ -151,11 +151,11 @@ setTimeout(() => {
 
 setTimeout(() => { 
     cancelAnimationFrame(speedupID);
-}, 6000);
+}, 2000);
 
 setTimeout(() => {
     slowDown();
-}, 8000);
+}, 6000);
 
 
 function heartShapeDerivative(t, scale) {
@@ -188,4 +188,4 @@ setTimeout(() => {
     document.getElementById('sentence').style.bottom = '50%';
     document.getElementById('sentence').style.opacity = '1';
     document.getElementById('sentence').style.fontSize = '24px';
-}, 12000);
+}, 8000);
